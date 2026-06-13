@@ -14,12 +14,20 @@ import (
 // ==========================================================================
 
 type CrossLoginReq struct{ UserID string }
-type CrossLoginResp struct{ OK bool; Message string }
+type CrossLoginResp struct {
+	OK      bool
+	Message string
+}
 
 // --- Gate Actor (discovers game by name) ---
 
 type crossGateActor struct {
 	resultCh chan string
+}
+
+func (a *crossGateActor) Name() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a *crossGateActor) OnInit(ctx ActorContext) {}
@@ -50,6 +58,11 @@ func (a *crossGateActor) HandleMessage(ctx ActorContext, msg interface{}) {
 type crossGameActor struct {
 	router  Router
 	pending map[string]*Future
+}
+
+func (a *crossGameActor) Name() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a *crossGameActor) OnInit(ctx ActorContext) {
@@ -96,6 +109,11 @@ type CrossDBQueryResp struct{ Level int }
 
 type crossDBActor struct {
 	router Router
+}
+
+func (a *crossDBActor) Name() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a *crossDBActor) OnInit(ctx ActorContext) {
@@ -194,6 +212,11 @@ type crossGateActorV2 struct {
 	eventCh chan string
 }
 
+func (a *crossGateActorV2) Name() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (a *crossGateActorV2) OnInit(ctx ActorContext) {
 	// Register self with game by sending a message ?game uses ctx.Sender()
 	if gamePID, ok := ctx.Lookup("game2"); ok {
@@ -215,6 +238,11 @@ func (a *crossGateActorV2) HandleMessage(ctx ActorContext, msg interface{}) {
 type crossGameActorV3 struct {
 	router Router
 	gates  []PID
+}
+
+func (a *crossGameActorV3) Name() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a *crossGameActorV3) OnInit(ctx ActorContext) {

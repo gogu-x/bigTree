@@ -88,6 +88,11 @@ type pingActor struct {
 	t *testing.T
 }
 
+func (a *pingActor) Name() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (a *pingActor) OnInit(ctx ActorContext) {}
 func (a *pingActor) OnStop(ctx ActorContext) {}
 
@@ -118,6 +123,11 @@ func TestRequestResponse(t *testing.T) {
 type stopActor struct {
 	stopped bool
 	mu      sync.Mutex
+}
+
+func (a *stopActor) Name() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a *stopActor) OnInit(ctx ActorContext) {}
@@ -204,6 +214,11 @@ type requesterActor struct {
 	resultCh chan PipeResult
 }
 
+func (a *requesterActor) Name() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (a *requesterActor) OnInit(ctx ActorContext) {}
 func (a *requesterActor) OnStop(ctx ActorContext) {}
 
@@ -249,6 +264,11 @@ type multiRequestActor struct {
 	targetA  PID
 	targetB  PID
 	resultCh chan PipeResult
+}
+
+func (a *multiRequestActor) Name() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a *multiRequestActor) OnInit(ctx ActorContext) {}
@@ -313,6 +333,11 @@ type gameActor struct {
 	resultCh chan string
 }
 
+func (a *gameActor) Name() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (a *gameActor) OnInit(ctx ActorContext) {
 	a.router.Register(&LoginRequest{}, a.handleLogin)
 	a.router.Register(&MoveRequest{}, a.handleMove)
@@ -368,6 +393,11 @@ type callbackActor struct {
 	resultCh chan string
 }
 
+func (a *callbackActor) Name() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (a *callbackActor) OnInit(ctx ActorContext) {}
 func (a *callbackActor) OnStop(ctx ActorContext) {}
 
@@ -411,6 +441,11 @@ func TestCallback(t *testing.T) {
 type multiCallbackActor struct {
 	target   PID
 	resultCh chan string
+}
+
+func (a *multiCallbackActor) Name() {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a *multiCallbackActor) OnInit(ctx ActorContext) {}
