@@ -134,6 +134,7 @@ func (sys *ActorSystem) run(proc *actorProcess) {
 				sender: m.sender,
 				msg:    m.msg,
 				future: m.future,
+				values: m.values,
 			}
 			sys.safeCall(proc, func() { proc.actor.HandleMessage(reqCtx, m.msg) })
 
@@ -143,6 +144,7 @@ func (sys *ActorSystem) run(proc *actorProcess) {
 				system: sys,
 				sender: m.sender,
 				msg:    m.msg,
+				values: m.values,
 			}
 			sys.safeCall(proc, func() { proc.actor.HandleMessage(msgCtx, m.msg) })
 
@@ -176,13 +178,17 @@ func (sys *ActorSystem) Send(pid PID, msg interface{}) bool {
 }
 
 func (sys *ActorSystem) send(pid PID, msg interface{}, sender PID) bool {
+	return sys.sendWithValues(pid, msg, sender, nil)
+}
+
+func (sys *ActorSystem) sendWithValues(pid PID, msg interface{}, sender PID, values map[string]interface{}) bool {
 	sys.mu.RLock()
 	proc, ok := sys.actors[pid]
 	sys.mu.RUnlock()
 	if !ok {
 		return false
 	}
-	proc.mailbox.PushUser(&messageEnvelope{msg: msg, sender: sender})
+	proc.mailbox.PushUser(&messageEnvelope{msg: msg, sender: sender, values: values})
 	return true
 }
 
@@ -207,13 +213,17 @@ func (sys *ActorSystem) TrySend(pid PID, msg interface{}) bool {
 }
 
 func (sys *ActorSystem) trySend(pid PID, msg interface{}, sender PID) bool {
+	return sys.trySendWithValues(pid, msg, sender, nil)
+}
+
+func (sys *ActorSystem) trySendWithValues(pid PID, msg interface{}, sender PID, values map[string]interface{}) bool {
 	sys.mu.RLock()
 	proc, ok := sys.actors[pid]
 	sys.mu.RUnlock()
 	if !ok {
 		return false
 	}
-	return proc.mailbox.TryPushUser(&messageEnvelope{msg: msg, sender: sender})
+	return proc.mailbox.TryPushUser(&messageEnvelope{msg: msg, sender: sender, values: values})
 }
 
 // Request delivers a message to the target actor and returns a Future.
@@ -224,18 +234,19 @@ func (sys *ActorSystem) Request(pid PID, msg interface{}) *Future {
 }
 
 func (sys *ActorSystem) request(pid PID, msg interface{}, sender PID) *Future {
-	f := NewFuture()
+	return sys.requestWithValues(pid, msg, sender, nil)
+}
 
+func (sys *ActorSystem) requestWithValues(pid PID, msg interface{}, sender PID, values map[string]interface{}) *Future {
+	f := NewFuture()
 	sys.mu.RLock()
 	proc, ok := sys.actors[pid]
 	sys.mu.RUnlock()
-
 	if !ok {
 		f.Respond(nil, ErrActorNotFound)
 		return f
 	}
-
-	proc.mailbox.PushUser(&requestEnvelope{msg: msg, sender: sender, future: f})
+	proc.mailbox.PushUser(&requestEnvelope{msg: msg, sender: sender, future: f, values: values})
 	return f
 }
 

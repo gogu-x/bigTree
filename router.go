@@ -36,6 +36,14 @@ func (r *Router) SetFallback(h Handler) {
 	r.fallback = h
 }
 
+// RegisterFunc 泛型注册，fn 直接接收强类型消息，省去类型断言。
+// 用法：actor.RegisterFunc(r, &LoginReq{}, func(ctx ActorContext, req *LoginReq) { ... })
+func RegisterFunc[Req any](r *Router, prototype Req, fn func(ActorContext, Req)) {
+	r.Register(prototype, func(ctx ActorContext, msg interface{}) {
+		fn(ctx, msg.(Req))
+	})
+}
+
 // Route dispatches msg to the registered handler based on its concrete type.
 // Returns true if a handler was found and called.
 func (r *Router) Route(ctx ActorContext, msg interface{}) bool {

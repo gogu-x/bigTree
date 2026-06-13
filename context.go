@@ -35,6 +35,10 @@ type ActorContext interface {
 	Register(name string)
 	// System returns the ActorSystem this actor belongs to.
 	System() *ActorSystem
+	// SetValue stores a user-defined value associated with the given key.
+	SetValue(key string, value interface{})
+	// GetValue retrieves a user-defined value by key. Returns nil if not set.
+	GetValue(key string) interface{}
 }
 
 // localContext implements ActorContext for actors managed by an ActorSystem.
@@ -44,6 +48,7 @@ type localContext struct {
 	sender PID
 	msg    interface{}
 	future *Future
+	values map[string]interface{}
 }
 
 func (c *localContext) Self() PID               { return c.self }
@@ -52,10 +57,10 @@ func (c *localContext) Message() interface{}    { return c.msg }
 func (c *localContext) Future() *Future         { return c.future }
 func (c *localContext) System() *ActorSystem    { return c.system }
 func (c *localContext) Send(pid PID, msg interface{}) bool {
-	return c.system.send(pid, msg, c.self)
+	return c.system.sendWithValues(pid, msg, c.self, c.values)
 }
 func (c *localContext) TrySend(pid PID, msg interface{}) bool {
-	return c.system.trySend(pid, msg, c.self)
+	return c.system.trySendWithValues(pid, msg, c.self, c.values)
 }
 func (c *localContext) Response(value interface{}, err error) {
 	if c.future != nil {
@@ -64,11 +69,23 @@ func (c *localContext) Response(value interface{}, err error) {
 }
 func (c *localContext) Stop() { c.system.stop(c.self) }
 func (c *localContext) Request(pid PID, msg interface{}) *Future {
-	return c.system.request(pid, msg, c.self)
+	return c.system.requestWithValues(pid, msg, c.self, c.values)
 }
 func (c *localContext) Lookup(name string) (PID, bool) {
 	return c.system.Lookup(name)
 }
 func (c *localContext) Register(name string) {
 	c.system.Register(name, c.self)
+}
+func (c *localContext) SetValue(key string, value interface{}) {
+	if c.values == nil {
+		c.values = make(map[string]interface{})
+	}
+	c.values[key] = value
+}
+func (c *localContext) GetValue(key string) interface{} {
+	if c.values == nil {
+		return nil
+	}
+	return c.values[key]
 }

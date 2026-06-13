@@ -49,6 +49,7 @@ const (
 type messageEnvelope struct {
 	msg    interface{}
 	sender PID
+	values map[string]interface{}
 }
 
 // requestEnvelope wraps a user message with sender information and a Future
@@ -57,4 +58,5 @@ type requestEnvelope struct {
 	msg    interface{}
 	sender PID
 	future *Future
+	values map[string]interface{}
 }
